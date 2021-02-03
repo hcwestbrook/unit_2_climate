@@ -1,0 +1,145 @@
+---
+title: "ClassNotesBoolean"
+author: "Holly Westbrook"
+date: "2/3/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+you can load and .Rmd file from class with only the code chunks with he following
+
+```{r}
+knitr::purl("4_co2_mauna_loa.Rmd")
+```
+Now it will be in the files pane
+
+```{r}
+world_oceans =  data.frame(ocean = c("Atlantic", "Pacific", "Indian", "Arctic", "Southern"),
+                area_km2 = c(77e6, 156e6, 69e6, 14e6, 20e6),
+                avg_depth_m = c(3926, 4028, 3963, 3953, 4500))
+head(world_oceans)
+world_oceans$avg_depth_m > 4000
+```
+Now let's look at the data for oceans > 4000 m
+```{r}
+world_oceans[world_oceans$avg_depth_m > 4000, ]
+
+sum(world_oceans$avg_depth_m > 4000)
+```
+To return the answers in one column defined by the value in another column use the following:
+
+``` {r}
+world_oceans$ocean[world_oceans$avg_depth_m > 4000]
+
+```
+Returns ocean name based on depth > 4000
+Exercise 2.1
+
+Create a vector with the names of the oceans you have personally visited. Use the `%in%` operator to subset the oceans you have visited from the world_oceans data frame. Now use subsetting to find out whether you have ever personally visited any oceans that have a smaller area than the Atlantic ocean
+``` {r}
+my_oceans_names = c("Atlantic", "Indian", "Arctic")
+my_oceans = world_oceans[world_oceans$ocean %in% my_oceans_names,]
+my_oceans
+my_oceans[my_oceans$area_km2 < 7.7e+07,]
+```
+
+Precision
+```{r}
+x = 5
+y = 5
+x == y
+1+2 == 3
+0.1 + 0.2 == 0.3
+```
+Why is this false?
+At a super small level of precision these end up being not true
+If needed you can create an error threshold
+
+```{r}
+error_threshold = 0.000000001
+
+abs(0.1+0.2)-0.3 < error_threshold
+```
+More info on this:
+<https://medium.com/better-programming/why-is-0-1-0-2-not-equal-to-0-3-in-most-programming-languages-99432310d476>
+
+```{r}
+x = 10
+y = 5
+z = 2
+
+x < y & y >z
+```
+Even if one of them is true, if one is false & will list it as false
+
+```{r}
+x < y | y > z
+```
+with or, | , will return true if one of them is true
+
+```{r}
+a = c( TRUE, TRUE, FALSE)
+all(a)
+
+data = c(1,2,3,NA,4)
+data == NA #doesn't work
+is.na(data)
+
+any(is.na(data))
+all(is.na(data))
+```
+Make a condition where if there are any negative values it turns to a positive value
+uses if statemetns
+```{r}
+num = -2
+if(num < 0){
+  print("your number is negative")
+  num = num*-1
+}
+num
+
+num2 = 8
+if(num2 < 0){
+  print("your number is negative")
+  num2 = num2*-1
+}
+num2
+```
+Exercise 3.1
+Let's say you took someone's temperature and you want to first evaluate whether or not they have a fever. If they DO have a fever, claculate how different their temperature is from the median human temperature of 98.6 and print out the answer. Also, if they DO have a fever, evaluate whether the fever is high > 101 and if it is, print out a warning message. This will require a set of nested `if()` statements. Test your code with a temperature that is not a fever (`temp = 98.4`), that is a low fever (`temp = 99.5`) and that is a high fever (`temp = 102.1`).
+
+```{r}
+temp = 102.1
+if(temp>98.6){
+  print(temp - 98.6)
+    if(temp > 101){
+      print("Go to the doctor! D:")
+    }
+}
+```
+else if statements are only evaluated if the prior statement is false, this is an if else chain
+```{r}
+score_1 = 35
+score_2 = 45
+if(score_1 > score_2){
+  print("1 wins!")
+} else if (score_2 > score_1){
+  print("2 wins!")
+} else {
+  print("It's a tie!")
+}
+```
+Fairly efficient coding because it doesn't run all the code unless specific conditions are not met.
+
+ifelse() can be used to do the same thing for short tasks
+ifelse(condition, if true do this, if false do this)
+```{r}
+a = 0
+ifelse(a > 0, 1/a, NA)
+a = 5
+ifelse(a > 0, 1/a, NA)
+
+```

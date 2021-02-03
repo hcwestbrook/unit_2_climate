@@ -1,0 +1,20 @@
+---
+title: "ClassNotesMaunaLoaCO2"
+author: "Holly Westbrook"
+date: "2/3/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+you can run the code that reads a table from an url. There is also a file to run this from a downloaded .txt file in case the site is down
+
+```{r}
+url = 'ftp://aftp.cmdl.noaa.gov/products/trends/co2/co2_mm_mlo.txt'
+co2 = read.table(url, col.names = c("year", "month", "decimal_date",
+                                    "monthly_average", "deseasonalized",
+                                    "n_days", "st_dev_days",
+                                    "monthly_mean_uncertainty"))
+head(co2)
+```

@@ -1,7 +1,7 @@
 ---
 title: "ClassNotesMaunaLoaCO2"
 author: "Holly Westbrook"
-date: "2/3/2021"
+date: "2/8/2021"
 output: html_document
 ---
 
@@ -17,4 +17,79 @@ co2 = read.table(url, col.names = c("year", "month", "decimal_date",
                                     "n_days", "st_dev_days",
                                     "monthly_mean_uncertainty"))
 head(co2)
+class(co2)
+summary(co2)
+range(co2$decimal_date)
+range(co2$monthly_average)
 ```
+Going to make headings while plotting to make it look nice
+
+```{r}
+######################
+#Plot
+######################
+plot(monthly_average~decimal_date,co2, type ="l")+
+  lines(y=co2$deseasonalized, x = co2$decimal_date, col= "red")
+
+co2$seasonal_cycle = co2$monthly_average - co2$deseasonalized
+head(co2)
+plot(seasonal_cycle ~ decimal_date, co2, type = "l")
+```
+Now we're going to look at the data starting from 2015 like so
+
+```{r}
+#####################
+#Plot
+#####################
+
+plot(seasonal_cycle ~ decimal_date, co2[co2$decimal_date > 2015,], type = "l")
+```
+
+Looking the seasonal cycle anomalies 
+```{r}
+
+#############################
+#     Seasonal Cycle Analysis
+#############################
+jan_anomalies = co2$seasonal_cycle[which(co2$month==1)]
+mean(jan_anomalies)
+
+co2_monthly_cycle = data.frame(month = seq(1,12), detrended_monthly_cycle = NA)
+
+#Find mean anomalies for aech month 1958-2021
+co2_monthly_cycle$detrended_monthly_cycle[1] = mean(co2$seasonal_cycle[which(co2$month==1)])
+co2_monthly_cycle$detrended_monthly_cycle[2] = mean(co2$seasonal_cycle[which(co2$month==2)])
+co2_monthly_cycle$detrended_monthly_cycle[3] = mean(co2$seasonal_cycle[which(co2$month==3)])
+co2_monthly_cycle$detrended_monthly_cycle[4] = mean(co2$seasonal_cycle[which(co2$month==4)])
+co2_monthly_cycle$detrended_monthly_cycle[5] = mean(co2$seasonal_cycle[which(co2$month==5)])
+co2_monthly_cycle$detrended_monthly_cycle[6] = mean(co2$seasonal_cycle[which(co2$month==6)])
+co2_monthly_cycle$detrended_monthly_cycle[7] = mean(co2$seasonal_cycle[which(co2$month==7)])
+co2_monthly_cycle$detrended_monthly_cycle[8] = mean(co2$seasonal_cycle[which(co2$month==8)])
+co2_monthly_cycle$detrended_monthly_cycle[9] = mean(co2$seasonal_cycle[which(co2$month==9)])
+co2_monthly_cycle$detrended_monthly_cycle[10] = mean(co2$seasonal_cycle[which(co2$month==10)])
+co2_monthly_cycle$detrended_monthly_cycle[11] = mean(co2$seasonal_cycle[which(co2$month==11)])
+co2_monthly_cycle$detrended_monthly_cycle[12] = mean(co2$seasonal_cycle[which(co2$month==12)])
+
+co2_monthly_cycle
+```
+This was doable because it was only 12 months, but if you're working with larger data sets it's not realistic to do it like this.
+Instead we should use a loop (which we'll talk about soon)
+
+```{r}
+###########################
+#Plot Seasonal Cycle
+###########################
+plot(detrended_monthly_cycle~month, co2_monthly_cycle, type = "l")
+```
+This shows the seasonal cycle in the northern hemisphere, as CO2 gets sequestered in the spring & summer, then released in the fall & winter
+
+#####Exercise 4.1
+As a result of climate change, there have been many phenological changes in the physical and biological environment. That means that there is a shift in the timing of seasonal phenomena and activities. One of the most obvious examples of this is that as many parts of the world warm, the spring growing season for plants is starting a bit earlier each spring. Plot the seasonal cycle of co2 for 1959 (the first full year of data) and 2020 (the last full year of data) on the same figure. What do you notice? Is this a robust analysis to determine if there has been a phenological shift in global carbon uptake / respiration?
+
+```{r}
+
+plot(seasonal_cycle~month, co2[co2$year == 2020,], type = "l", col = "red") +
+  lines(seasonal_cycle~month, co2[co2$year == 1959,], col = "black")
+
+```
+Next subject is loops

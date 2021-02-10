@@ -1,0 +1,95 @@
+---
+title: "ClassNotesSeaIce"
+author: "Holly Westbrook"
+date: "2/10/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+before this I installed lubridate with 
+install.packages("lubridate")
+lubridate handles issues with dates
+
+```{r}
+# arctic_ice = read.csv("data/N_seaice_extent_daily_v3.0.csv", skip=2, header = FALSE, col.names = c("Year", "Month", "Day", "Extent", "Missing", "Source_Data"))
+url = 'ftp://sidads.colorado.edu/DATASETS/NOAA/G02135/north/daily/data/N_seaice_extent_daily_v3.0.csv'
+arctic_ice = read.delim(url, skip=2, sep=",", header=FALSE, col.names = c("Year", "Month", "Day", "Extent", "Missing", "Source_Data"))
+head(arctic_ice)
+
+head(arctic_ice)
+library(lubridate)
+
+arctic_ice$date = make_date(year = arctic_ice$Year, month = arctic_ice$Month, day = arctic_ice$Day)
+head(arctic_ice)
+class(arctic_ice$date) ### R handles dates uniquely quick makes plotting dates easier to handle
+
+plot(Extent~date, data = arctic_ice, type="l")
+```
+
+
+now we'll calculate the averages for each year with a for loop
+we'll start with the annual average
+first we'll create empty variables for annual average and 5 yr average
+
+
+
+```{r}
+arctic_ice_annual = data.frame(Year=c(1978:2021), extent_annual_avg = NA, extent_5yr_avg = NA)
+arctic_ice_annual$extent_annual_avg[1]= mean(arctic_ice$Extent[which(arctic_ice$Year == 1978)])
+```
+
+
+this adds the mean into the data frame, now we'll use a loop to repeat this for all the years
+2021 data is skewed because we only have like 1 month of data so we'll ignore it with the 
+
+
+```{r}
+dim(arctic_ice_annual)
+for (i in seq(dim(arctic_ice_annual)[1])){
+  arctic_ice_annual$extent_annual_avg[i] = mean(arctic_ice$Extent[which(arctic_ice$Year == arctic_ice_annual$Year[i])])
+}
+
+arctic_ice_annual
+
+plot(extent_annual_avg ~ Year, data = arctic_ice_annual, type = "l")
+
+```
+
+
+
+2021 data is skewed because we only have like 1 month of data so we'll ignore it like so
+
+```{r}
+arctic_ice_annual = data.frame(Year=c(1978:2021), extent_annual_avg = NA, extent_5yr_avg = NA)
+for (i in seq(dim(arctic_ice_annual)[1]-1)){
+  arctic_ice_annual$extent_annual_avg[i] = mean(arctic_ice$Extent[which(arctic_ice$Year == arctic_ice_annual$Year[i])])
+}
+
+arctic_ice_annual
+
+plot(extent_annual_avg ~ Year, data = arctic_ice_annual, type = "l")
+
+```
+
+
+
+now we'll do the 5 year rolling average, which will involve index math
+there are different ways to do a rolling average, so be clear about how you're doing it
+For us, we'll make the year of interest the middle year in the 5 year average
+
+
+```{r}
+for (i in seq(dim(arctic_ice_annual)[1]-1)){
+  years = seq(arctic_ice_annual$Year[i]-2,arctic_ice_annual$Year[i]+2)
+  arctic_ice_annual$extent_5yr_avg[i] = mean(arctic_ice$Extent[which(arctic_ice$Year %in% years)])
+}
+
+arctic_ice_annual
+
+plot(extent_5yr_avg ~ Year, data = arctic_ice_annual, type = "l", col = "red") +
+  lines(extent_annual_avg ~ Year, data = arctic_ice_annual, type = "l")
+
+```

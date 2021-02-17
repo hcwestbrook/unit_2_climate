@@ -1,0 +1,118 @@
+---
+title: "Class Notes Global Temperature"
+author: "Holly Westbrook"
+date: "2/17/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(fig.width=6, fig.asp = 0.8, collapse=TRUE) 
+```
+
+```{r}
+url = 'https://data.giss.nasa.gov/gistemp/graphs/graph_data/Global_Mean_Estimates_based_on_Land_and_Ocean_Data/graph.txt'
+temp_anomaly = read.delim(url, skip=5, sep="", header=FALSE, col.names = c("Year", "No_Smoothing", "Lowess_5"))
+
+head(temp_anomaly)
+summary(temp_anomaly)
+plot(No_Smoothing ~ Year, data = temp_anomaly, type="b")+ #b is both points and lines
+lines(Lowess_5 ~ Year, data = temp_anomaly, col="red")
+```
+
+2013 IPCC came out with a report and said it looks like the wamring seams to be slowing down
+let's put in some lines to see what they were talking about. They specified that they were looking between 1998 and 2012
+
+
+```{r}
+plot(No_Smoothing ~ Year, data = temp_anomaly, type="b")+ #b is both points and lines
+lines(Lowess_5 ~ Year, data = temp_anomaly, col="red")+
+  abline(v=2012, lty = "dashed")+
+  abline(v=1998, lty ="dashed")
+
+temp_1998 = temp_anomaly$No_Smoothing[which(temp_anomaly$Year ==1998)]
+temp_1998
+
+temp_2012 = temp_anomaly$No_Smoothing[which(temp_anomaly$Year ==2012)]
+temp_2012
+
+plot(No_Smoothing ~ Year, data = temp_anomaly, type="b")+ #b is both points and lines
+lines(Lowess_5 ~ Year, data = temp_anomaly, col="red")+
+  abline(v=2012, lty = "dashed")+
+  abline(v=1998, lty ="dashed")+
+  lines(y = c(temp_1998, temp_2012), x= c(1998, 2012), col = "blue", lwd=2)
+
+```
+
+This conclusion was because they didn't look at a long enough time scale
+
+Calculate rolling averages for temp anomaly 
+
+```{r}
+roll_avg = temp_anomaly
+roll_avg$year5 = NA
+roll_avg$year10 = NA
+head(roll_avg)
+
+dim(roll_avg)
+for(i in seq(dim(roll_avg)[1])){
+  #calculate the 5 year rolling averages
+  if(i >=5){
+    roll_avg$year5[i] = mean(roll_avg$No_Smoothing[c((i-4):i)])
+  }
+  if (i >=10){
+    roll_avg$year10[i] = mean(roll_avg$No_Smoothing[c((i-9):i)])
+
+  }
+}
+
+head(roll_avg)
+```
+
+Now let's plot it
+
+
+
+```{r}
+plot(No_Smoothing ~ Year, data=roll_avg, ylab="Global mean temperature anomaly") + 
+  lines(No_Smoothing ~ Year, data=roll_avg) +
+  lines(year5 ~ Year, data=roll_avg, col="red") +
+  lines(year10 ~ Year, data=roll_avg, col="blue")
+
+
+```
+
+save this image as a pdf
+
+```{r}
+#create a relative directory so it gets saved in the figures folder that we already have in this directory
+pdf('figures/global_mean_temp_rolling_averages.pdf', width=7, height=5)
+plot(No_Smoothing ~ Year, data=roll_avg, ylab="Global mean temperature anomaly") + 
+  lines(No_Smoothing ~ Year, data=roll_avg) +
+  lines(year5 ~ Year, data=roll_avg, col="red") +
+  lines(year10 ~ Year, data=roll_avg, col="blue")
+dev.off()
+
+```
+
+
+8.1
+
+Create a user-defined function that is designed to take this temperature anomaly data frame `temp_anomaly` as a parameter called `data` along with a variable `num_years` that indicates the number of years in the rolling average that someone may want to compute. Have the function return the `temp_anomaly` data frame with an added column called `temp_anomaly$roll_avg` that contains the rolling average corresponding to `num_years`. 
+
+```{r}
+rolling = function(data, num_years=5){
+  data$roll_avg = NA # Initialize results column
+  for(i in seq(dim(data)[1])){
+  if(i >=num_years & i <=(dim(data)[1])){
+    data$roll_avg[i]= mean(data[c((i-(num_years-1)):i), 'No_Smoothing'])
+  }
+  }
+}
+
+rolling(temp_anomaly, 5)
+
+head(temp_anomaly)
+```
+
+
+

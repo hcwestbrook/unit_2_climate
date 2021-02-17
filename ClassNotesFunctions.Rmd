@@ -1,0 +1,103 @@
+---
+title: "Class Notes Functions"
+author: "Holly Westbrook"
+date: "2/17/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+avg = function(x){ #x parameter is the data
+  s = sum(x)
+  n = length(x)
+  result = s/n
+  return(result)
+  
+}
+
+data = c(1,3,5,7)
+data_avg = avg(data)
+data_avg
+```
+
+Even if you don't explicitly return the results it will return whatever the last value was
+
+```{r}
+avg = function(x){ #x parameter is the data
+  s = sum(x)
+  n = length(x)
+  s/n
+  
+}
+
+data = c(1,3,5,7)
+data_avg = avg(data)
+data_avg
+```
+
+Write a function for arithmetic and geometric averages
+
+```{r}
+#if the parameter arithmetifc = TRUE, return arithmetic mean
+#if arithmetic = FALSE, return geometric mean
+avg = function(x, arithmetic=TRUE){ 
+  n = length(x)
+  result =ifelse(arithmetic, sum(x)/n, prod(x)^(1/n))
+  return(result)
+  
+}
+
+data = c(1,3,5,7)
+avg(data)
+avg(data, arithmetic=TRUE)
+avg(data, arithmetic=FALSE)
+avg(data,TRUE)
+avg(data,FALSE)
+
+
+
+```
+
+You can add in stops to try to account for user error
+
+
+```{r}
+
+avg = function(x, arithmetic=TRUE){ 
+  if(!is.numeric(x)){stop("Error: function failed. x must be numeric")}
+  n = length(x)
+  result =ifelse(arithmetic, sum(x)/n, prod(x)^(1/n))
+  return(result)
+  
+}
+avg(data,TRUE)
+avg(TRUE, data)
+
+```
+
+
+Exercise 7.1
+
+Create a function that reads in someone's grade percentage points and returns their letter grade (A: 90-100, B: 80-90, etc.). You can imagine how you could make this function fancier by including grading scheme info in the parameters to ask if the function user wanted to also know if the student earned a B+, B or B-.
+
+
+```{r}
+grade = function(x){
+  ifelse(x >=90, print("A"), ifelse(x >=80, print("B"), 
+      ifelse(x>=70, print("C"), ifelse(x>=60, print("D"), 
+      ifelse(x<60, print("F"), print("Error"))))))
+}
+
+grade(50)
+
+
+
+```
+
+
+
+
+
